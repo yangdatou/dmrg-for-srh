@@ -1,0 +1,32 @@
+200000
+ 
+:: initializing oneAPI environment ...
+   slurm_script: BASH_VERSION = 4.2.46(1)-release
+   args: Using "$@" for setvars.sh arguments: --force
+:: advisor -- latest
+:: ccl -- latest
+:: clck -- latest
+:: compiler -- latest
+:: dal -- latest
+:: debugger -- latest
+:: dev-utilities -- latest
+:: dnnl -- latest
+:: dpcpp-ct -- latest
+:: dpl -- latest
+:: inspector -- latest
+:: intelpython -- latest
+:: ipp -- latest
+:: ippcp -- latest
+:: ipp -- latest
+:: itac -- latest
+:: mkl -- latest
+:: mpi -- latest
+:: tbb -- latest
+:: vpl -- latest
+:: vtune -- latest
+:: oneAPI environment initialized ::
+ 
+TMPDIR = /scratch/global/yangjunjie/cr2/522187/
+PYSCF_TMPDIR = /scratch/global/yangjunjie/cr2/522187/
+Warning: <pyscf.gto.mole.Mole object at 0x7fb3fd7b2610> must be initialized before calling SCF.
+Initialize <pyscf.gto.mole.Mole object at 0x7fb3fd7b2610> in RHF object of <class 'pyscf.scf.hf.RHF'>
