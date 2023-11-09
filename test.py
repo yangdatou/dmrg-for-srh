@@ -14,6 +14,7 @@ dmrgscf.settings.MPIPREFIX = 'mpirun -n %d --bind-to none' % nproc
 max_m = 2000
 
 mol = gto.Mole()
+mol.verbose = 10
 ene_nuc, h1, eri, ncipg, weightpg, Rpg, nao, NOccSO = pickle.load(open( "FC.p", "rb" ))
 mol.nelectron = NOccSO
 ovlp = np.eye(nao)
