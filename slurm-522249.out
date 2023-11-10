@@ -218,3 +218,45 @@ fullrestart            = False
 num_thrds              = 28
 memory                 = 200
 
+CASCI E = -233.209384498058  S^2 = 0.0000000
+Set conv_tol_grad to 0.000316228
+macro iter 1 (21 JK  4 micro), CASSCF E = -233.452999562541  dE = -0.24361506  S^2 = 0.0000000
+               |grad[o]|=0.317  |ddm|=0.377  |maxRot[o]|=0.252
+macro iter 2 (15 JK  4 micro), CASSCF E = -233.456346753887  dE = -0.0033471913  S^2 = 0.0000000
+               |grad[o]|=0.0413  |ddm|=0.0535  |maxRot[o]|=0.113
+macro iter 3 (13 JK  4 micro), CASSCF E = -233.456351071244  dE = -4.3173568e-06  S^2 = 0.0000000
+               |grad[o]|=0.000769  |ddm|=0.00342  |maxRot[o]|=0.00525
+macro iter 4 (3 JK  1 micro), CASSCF E = -233.456351030975  dE = 4.0269384e-08  S^2 = 0.0000000
+               |grad[o]|=7.25e-05  |ddm|=9.06e-05  |maxRot[o]|=0.000333
+1-step CASSCF converged in 4 macro (52 JK 13 micro) steps
+CASSCF canonicalization
+Density matrix diagonal elements [1.99637536 1.99957788 1.99308382 1.99373686 1.99373701 1.9945884
+ 1.9945886  1.99360525 1.83807394 1.82209451 1.82209522 1.60994759
+ 1.60994719 1.88370434 0.08615445 0.39628475 0.39628464 0.20298784
+ 0.18656517 0.18656719]
+CASSCF energy = -233.456351030975
+CASCI E = -233.456351030975  E(CI) = -233.456351030975  S^2 = 0.0000000
+E(CAS)= -2086.711484425599
+FCI vector not available, call CASCI to update wavefunction
+Traceback (most recent call last):
+  File "/home/yangjunjie/work/for-srh/test.py", line 47, in <module>
+    pt_obj.kernel()
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/mrpt/nevpt2.py", line 737, in kernel
+    self.mo_coeff, single_ci_vec, self.mo_energy = self.canonicalize(
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/mrpt/nevpt2.py", line 644, in canonicalize
+    return self._mc.canonicalize(mo_coeff, ci, eris, sort, cas_natorb, casdm1, verbose)
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/mcscf/casci.py", line 493, in canonicalize
+    mo_coeff1, ci, mc.mo_occ = mc.cas_natorb(mo_coeff, ci, eris, sort, casdm1,
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/mcscf/casci.py", line 1023, in cas_natorb
+    return cas_natorb(self, mo_coeff, ci, eris, sort, casdm1, verbose,
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/mcscf/casci.py", line 367, in cas_natorb
+    aaaa = ao2mo.kernel(mc.mol, mocas)
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/ao2mo/__init__.py", line 471, in kernel
+    return full(eri_or_mol, mo_coeffs, erifile, dataname, intor, *args, **kwargs)
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/ao2mo/__init__.py", line 159, in full
+    return mod.full_iofree(eri_or_mol, mo_coeff, intor, *args, **kwargs)
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/ao2mo/outcore.py", line 588, in full_iofree
+    general(mol, (mo_coeff,)*4, feri, dataname='eri_mo',
+  File "/home/yangjunjie/packages/pyscf/pyscf-main/pyscf/ao2mo/outcore.py", line 218, in general
+    assert (nao == mol.nao_nr('_cart' in intor))
+AssertionError
