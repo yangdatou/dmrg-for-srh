@@ -1,0 +1,220 @@
+200000
+ 
+:: initializing oneAPI environment ...
+   slurm_script: BASH_VERSION = 4.2.46(1)-release
+   args: Using "$@" for setvars.sh arguments: --force
+:: advisor -- latest
+:: ccl -- latest
+:: clck -- latest
+:: compiler -- latest
+:: dal -- latest
+:: debugger -- latest
+:: dev-utilities -- latest
+:: dnnl -- latest
+:: dpcpp-ct -- latest
+:: dpl -- latest
+:: inspector -- latest
+:: intelpython -- latest
+:: ipp -- latest
+:: ippcp -- latest
+:: ipp -- latest
+:: itac -- latest
+:: mkl -- latest
+:: mpi -- latest
+:: tbb -- latest
+:: vpl -- latest
+:: vtune -- latest
+:: oneAPI environment initialized ::
+ 
+TMPDIR = /scratch/global/yangjunjie/cr2/522249/
+PYSCF_TMPDIR = /scratch/global/yangjunjie/cr2/522249/
+Warning: <pyscf.gto.mole.Mole object at 0x7f0f30e216a0> must be initialized before calling SCF.
+Initialize <pyscf.gto.mole.Mole object at 0x7f0f30e216a0> in RHF object of <class 'pyscf.scf.hf.RHF'>
+#INFO: **** input file is /home/yangjunjie/work/for-srh/test.py ****
+import pickle, os, sys
+import numpy as np
+import pyscf
+from pyscf import gto, scf, fci
+from pyscf import mcscf, mrpt
+from pyscf import lib
+
+nproc = os.environ.get("SLURM_NPROCS", 1)
+nproc = int(nproc)
+
+from pyscf import dmrgscf
+dmrgscf.settings.BLOCKEXE = os.popen("which block2main").read().strip()
+dmrgscf.settings.MPIPREFIX = 'mpirun -n %d --bind-to none' % nproc
+max_m = 2000
+
+mol = gto.Mole()
+mol.verbose = 4
+ene_nuc, h1, eri, ncipg, weightpg, Rpg, nao, NOccSO = pickle.load(open( "FC.p", "rb" ))
+mol.nelectron = NOccSO
+ovlp = np.eye(nao)
+nso = 2 * nao
+
+# RHF
+hf_obj = scf.RHF(mol)
+hf_obj.get_hcore = lambda *args: h1
+hf_obj.get_ovlp = lambda *args: ovlp
+hf_obj._eri = pyscf.ao2mo.restore(8, eri, nao)
+hf_obj.kernel()
+hf_obj.mo_coeff = np.eye(nao)
+
+out = open("results.log","w")
+
+cas_obj = mcscf.CASSCF(hf_obj,20,28)
+cas_obj.fix_spin_(ss=0)
+cas_obj.fcisolver = dmrgscf.DMRGCI(mol, maxM=max_m)
+cas_obj.fcisolver.outputlevel = 5
+cas_obj.fcisolver.runtimeDir = lib.param.TMPDIR
+cas_obj.fcisolver.scratchDirectory = lib.param.TMPDIR
+cas_obj.fcisolver.threads = int(os.environ.get("OMP_NUM_THREADS", 1))
+cas_obj.fcisolver.memory = int(mol.max_memory / 1000.0 / nproc)
+cas_obj.kernel()
+print("E(CAS)=",cas_obj.e_tot + ene_nuc)
+out.write("E(CAS) = % 12.8f\n" % (cas_obj.e_tot + ene_nuc))
+
+# nevpt
+pt_obj = mrpt.NEVPT(cas_obj)
+pt_obj.kernel()
+print("E(PT)=",pt_obj.e_corr + cas_obj.e_tot + ene_nuc)
+out.write("E(PT)  = % 12.8f\n" % (pt_obj.e_corr + cas_obj.e_tot + ene_nuc))
+
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='pauling011', release='3.10.0-327.36.3.el7.x86_64', version='#1 SMP Thu Oct 20 04:56:07 EDT 2016', machine='x86_64')  Threads 28
+Python 3.9.7 (default, Oct 27 2021, 01:23:21) 
+[GCC 9.3.0]
+numpy 1.21.2  scipy 1.6.2
+Date: Thu Nov  9 16:19:31 2023
+PySCF version 2.1.1
+PySCF path  /home/yangjunjie/packages/pyscf/pyscf-main
+GIT ORIG_HEAD 9d5b5bd309d1cc55fbd1a0ec76e26b5b0c7f76af
+GIT HEAD (branch master) 8aa7a5b02dea52dfbc9e106e4f4737f86dc56376
+
+[ENV] PYSCF_MAX_MEMORY 200000
+[ENV] PYSCF_TMPDIR /scratch/global/yangjunjie/cr2/522249/
+[ENV] PYSCF_EXT_PATH /home/yangjunjie/intel/oneapi/intelpython/python3.9/lib/python3.9/site-packages/
+[CONFIG] conf_file /home/yangjunjie/.pyscf_conf.py
+[INPUT] verbose = 4
+[INPUT] num. atoms = 0
+[INPUT] num. electrons = 28
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 0
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+
+nuclear repulsion = 0
+number of shells = 0
+number of NR pGTOs = 0
+number of NR cGTOs = 0
+basis = sto-3g
+ecp = {}
+CPU time:         0.57
+
+
+******** <class 'pyscf.scf.hf.RHF'> ********
+method = RHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = /scratch/global/yangjunjie/cr2/522249/tmp5ht4wfmz
+max_memory 200000 MB (current use 383 MB)
+Overwritten attributes  get_hcore get_ovlp  of <class 'pyscf.scf.hf.RHF'>
+Set gradient conv threshold to 3.16228e-05
+No atom found in mol. Use 1e initial guess
+Initial guess from hcore.
+  HOMO = -15.3512548262224  LUMO = -15.3305206812731
+init E= -215.834441776583
+  HOMO = 0.0989696382328965  LUMO = 0.112728464896598
+cycle= 1 E= -201.695776565101  delta_E= 14.1  |g|= 11.5  |ddm|= 7.95
+  HOMO = -4.74102654332201  LUMO = -4.72388313806473
+cycle= 2 E= -223.442022545124  delta_E= -21.7  |g|= 5.93  |ddm|= 7.61
+  HOMO = -0.302923050183502  LUMO = -0.254806836203838
+cycle= 3 E= -232.450983117991  delta_E= -9.01  |g|= 0.842  |ddm|= 4.21
+  HOMO = -0.015744350887583  LUMO = 0.0488168121160374
+cycle= 4 E= -232.353281506682  delta_E= 0.0977  |g|= 1.09  |ddm|= 1.49
+  HOMO = -0.115242733559259  LUMO = 0.0352739097007067
+cycle= 5 E= -232.535279585282  delta_E= -0.182  |g|= 0.501  |ddm|= 0.487
+  HOMO = -0.233226968042208  LUMO = 0.0134839666032862
+cycle= 6 E= -232.586720737606  delta_E= -0.0514  |g|= 0.0239  |ddm|= 0.434
+  HOMO = -0.232009488481537  LUMO = 0.0143637764464329
+cycle= 7 E= -232.58712557583  delta_E= -0.000405  |g|= 0.0263  |ddm|= 0.0627
+  HOMO = -0.225342785765401  LUMO = 0.0163812034829063
+cycle= 8 E= -232.587375077466  delta_E= -0.00025  |g|= 0.00542  |ddm|= 0.0385
+  HOMO = -0.225593033443895  LUMO = 0.0161975593400384
+cycle= 9 E= -232.587425293225  delta_E= -5.02e-05  |g|= 0.00314  |ddm|= 0.0227
+  HOMO = -0.224918268078414  LUMO = 0.0159989119112229
+cycle= 10 E= -232.587442794596  delta_E= -1.75e-05  |g|= 0.000797  |ddm|= 0.0187
+  HOMO = -0.224607411684257  LUMO = 0.0159835115469057
+cycle= 11 E= -232.587444166295  delta_E= -1.37e-06  |g|= 0.00012  |ddm|= 0.00552
+  HOMO = -0.224578313673478  LUMO = 0.0159879001660026
+cycle= 12 E= -232.587444191349  delta_E= -2.51e-08  |g|= 2.61e-05  |ddm|= 0.000597
+  HOMO = -0.224568236641817  LUMO = 0.0159904338828978
+cycle= 13 E= -232.587444192341  delta_E= -9.93e-10  |g|= 4.76e-06  |ddm|= 0.000132
+  HOMO = -0.224566560134308  LUMO = 0.0159907234860707
+Extra cycle  E= -232.587444192367  delta_E= -2.54e-11  |g|= 2.8e-06  |ddm|= 1.38e-05
+converged SCF energy = -232.587444192367
+
+******** <class 'pyscf.mcscf.mc1step.CASSCF'> ********
+CAS (14e+14e, 20o), ncore = 0, nvir = 56
+max_cycle_macro = 50
+max_cycle_micro = 4
+conv_tol = 1e-07
+conv_tol_grad = None
+orbital rotation max_stepsize = 0.02
+orbital rotation threshold for CI restart = 0.01
+augmented hessian ah_max_cycle = 30
+augmented hessian ah_conv_tol = 1e-12
+augmented hessian ah_linear dependence = 1e-14
+augmented hessian ah_level shift = 1e-08
+augmented hessian ah_start_tol = 2.5
+augmented hessian ah_start_cycle = 3
+augmented hessian ah_grad_trust_region = 3
+kf_trust_region = 3
+kf_interval = 4
+ci_response_space = 4
+ci_grad_trust_region = 3
+with_dep4 0
+natorb = False
+canonicalization = True
+sorting_mo_energy = False
+ao2mo_level = 2
+chkfile = /scratch/global/yangjunjie/cr2/522249/tmp5ht4wfmz
+max_memory 200000 MB (current use 778 MB)
+internal_rotation = False
+
+******** Block flags ********
+executable             = /home/yangjunjie/packages/block2/block2-preview-p0.5.2rc10/pyblock2/driver/block2main
+BLOCKEXE_COMPRESS_NEVPT= /path/to/serially/compiled/Block/block.spin_adapted
+Block version          = 2.0
+mpiprefix              = mpirun -n 1 --bind-to none
+scratchDirectory       = /scratch/global/yangjunjie/cr2/522249/
+integralFile           = /scratch/global/yangjunjie/cr2/522249/FCIDUMP
+configFile             = /scratch/global/yangjunjie/cr2/522249/dmrg.conf
+outputFile             = /scratch/global/yangjunjie/cr2/522249/dmrg.out
+maxIter                = 36
+scheduleSweeps         = [0, 4, 8, 12, 16, 18, 20, 22, 24]
+scheduleMaxMs          = [200, 400, 800, 1600, 2000, 2000, 2000, 2000, 2000]
+scheduleTols           = [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 1e-05, 1.0000000000000002e-06, 1.0000000000000002e-07, 1e-08]
+scheduleNoises         = [0.0001, 0.0001, 0.0001, 0.0001, 0.0001, 1e-05, 1.0000000000000002e-06, 1.0000000000000002e-07, 0.0]
+twodot_to_onedot       = 28
+tol                    = 1e-07
+maxM                   = 2000
+dmrg switch tol        = 0.001
+wfnsym                 = 1
+fullrestart            = False
+num_thrds              = 28
+memory                 = 200
+

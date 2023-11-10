@@ -28,8 +28,6 @@ mkdir -p $TMPDIR
 export PATH=/home/yangjunjie/packages/block2/block2-preview-p0.5.2rc10/pyblock2/driver/:$PATH
 export PYTHONPATH=/home/yangjunjie/packages/pyscf/pyscf-main/;
 export PYTHONPATH=/home/yangjunjie/packages/block2/block2-preview-p0.5.2rc10/build-py-ext/:$PYTHONPATH;
-export PYTHONPATH=/home/yangjunjie/work/cas-diag-cc/:$PYTHONPATH;
-export PYTHONPATH=/home/yangjunjie/work/cas-diag-cc/work/n2/:$PYTHONPATH;
 export PYSCF_EXT_PATH=/home/yangjunjie/intel/oneapi/intelpython/python3.9/lib/python3.9/site-packages/;
 alias block2main="/home/yangjunjie/packages/block2/block2-preview-p0.5.2rc10/pyblock2/driver/block2main"
 
